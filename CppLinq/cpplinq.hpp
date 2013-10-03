@@ -144,7 +144,13 @@ namespace cpplinq
             {
             }
 
-            CPPLINQ_INLINEMETHOD explicit opt (value_type value)
+            CPPLINQ_INLINEMETHOD explicit opt (value_type const & value)
+                :   is_initialized      (true)
+            {
+                new (&storage) value_type (value);
+            }
+
+            CPPLINQ_INLINEMETHOD explicit opt (value_type&& value)
                 :   is_initialized      (true)
             {
                 new (&storage) value_type (std::move (value));
@@ -233,7 +239,12 @@ namespace cpplinq
                 return *this;
             }
 
-            CPPLINQ_INLINEMETHOD opt & operator= (value_type v)
+            CPPLINQ_INLINEMETHOD opt & operator= (value_type const & v)
+            {
+                return *this = opt (v);
+            }
+
+            CPPLINQ_INLINEMETHOD opt & operator= (value_type&& v)
             {
                 return *this = opt (std::move (v));
             }
@@ -3079,7 +3090,7 @@ namespace cpplinq
                     result.push_back (range.front ());
                 }
 
-                return std::move (result);
+                return result;
             }
 
         };
@@ -3110,7 +3121,7 @@ namespace cpplinq
                     result.push_back (range.front ());
                 }
 
-                return std::move (result);
+                return result;
             }
 
         };
@@ -3163,7 +3174,7 @@ namespace cpplinq
                     result.insert (typename result_type::value_type (std::move (k), std::move (v)));
                 }
 
-                return std::move (result);
+                return result;
             }
 
         };
@@ -3481,7 +3492,7 @@ namespace cpplinq
 
                 result_type result (16U, range, key_predicate);
 
-                return std::move (result);
+                return result;
             }
 
         };
@@ -3703,7 +3714,7 @@ namespace cpplinq
                     }
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -3734,7 +3745,7 @@ namespace cpplinq
                     current = std::move (range.front ());
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -3844,7 +3855,7 @@ namespace cpplinq
                 {
                     sum += selector (range.front ());
                 }
-                return std::move (sum);
+                return sum;
             }
 
         };
@@ -3873,7 +3884,7 @@ namespace cpplinq
                 {
                     sum += range.front ();
                 }
-                return std::move (sum);
+                return sum;
             }
 
         };
@@ -3916,7 +3927,7 @@ namespace cpplinq
                     }
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -3951,7 +3962,7 @@ namespace cpplinq
                     }
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -3995,7 +4006,7 @@ namespace cpplinq
                     }
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -4030,7 +4041,7 @@ namespace cpplinq
                     }
                 }
 
-                return std::move (current);
+                return current;
             }
 
         };
@@ -4158,7 +4169,7 @@ namespace cpplinq
                 {
                     sum = accumulator (sum, range.front ());
                 }
-                return std::move (sum);
+                return sum;
             }
 
         };
@@ -4909,7 +4920,7 @@ namespace cpplinq
 
     template<typename TContainer>
     CPPLINQ_INLINEMETHOD detail::from_range<typename TContainer::const_iterator> from (
-            TContainer  const & container
+            TContainer const &  container
         )
     {
         return detail::from_range<typename TContainer::const_iterator> (
@@ -4920,7 +4931,7 @@ namespace cpplinq
 
     template<typename TValueArray>
     CPPLINQ_INLINEMETHOD detail::from_range<typename detail::get_array_properties<TValueArray>::iterator_type> from_array (
-            TValueArray & a 
+            TValueArray &   a 
         ) throw ()
     {
         typedef detail::get_array_properties<TValueArray>   array_properties;
@@ -4937,7 +4948,7 @@ namespace cpplinq
 
     template<typename TContainer>
     CPPLINQ_INLINEMETHOD detail::from_copy_range<typename detail::cleanup_type<TContainer>::type> from_copy (
-            TContainer&& container
+            TContainer&&    container
         )
     {
         typedef typename detail::cleanup_type<TContainer>::type container_type;
@@ -4949,38 +4960,38 @@ namespace cpplinq
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::generate_range<TPredicate> generate (
-        TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::generate_range<TPredicate> (std::move (predicate));
+        return detail::generate_range<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     // Restriction operators
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::where_builder<TPredicate> where (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::where_builder<TPredicate> (std::move (predicate));
+        return detail::where_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     // Projection operators
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::select_builder<TPredicate> select (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::select_builder<TPredicate> (std::move (predicate));
+        return detail::select_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::select_many_builder<TPredicate> select_many (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::select_many_builder<TPredicate> (std::move (predicate));
+        return detail::select_many_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     template<
@@ -5018,23 +5029,25 @@ namespace cpplinq
     // Concatenation operators
 
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::concat_builder<TOtherRange> concat (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::concat_builder<TOtherRange> concat (
+            TOtherRange&&   other_range
+        ) throw ()
     {
-        return detail::concat_builder<TOtherRange> (std::move (other_range));
+        return detail::concat_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     // Partitioning operators
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::take_while_builder<TPredicate> take_while (
-            TPredicate        predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::take_while_builder<TPredicate> (std::move (predicate));
+        return detail::take_while_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::take_builder take (
-            size_type     count
+            size_type       count
         ) throw ()
     {
         return detail::take_builder (count);
@@ -5042,10 +5055,10 @@ namespace cpplinq
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::skip_while_builder<TPredicate> skip_while (
-            TPredicate        predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::skip_while_builder<TPredicate> (predicate);
+        return detail::skip_while_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::skip_builder skip (
@@ -5059,52 +5072,52 @@ namespace cpplinq
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::orderby_builder<TPredicate> orderby (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ,   bool            sort_ascending  = true
         ) throw ()
     {
-        return detail::orderby_builder<TPredicate> (std::move (predicate), sort_ascending);
+        return detail::orderby_builder<TPredicate> (std::forward<TPredicate> (predicate), sort_ascending);
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::orderby_builder<TPredicate> orderby_ascending (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::orderby_builder<TPredicate> (std::move (predicate), true);
+        return detail::orderby_builder<TPredicate> (std::forward<TPredicate> (predicate), true);
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::orderby_builder<TPredicate> orderby_descending (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::orderby_builder<TPredicate> (std::move (predicate), false);
+        return detail::orderby_builder<TPredicate> (std::forward<TPredicate> (predicate), false);
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::thenby_builder<TPredicate> thenby (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ,   bool            sort_ascending  = true
         ) throw ()
     {
-        return detail::thenby_builder<TPredicate> (std::move (predicate), sort_ascending);
+        return detail::thenby_builder<TPredicate> (std::forward<TPredicate> (predicate), sort_ascending);
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::thenby_builder<TPredicate> thenby_ascending (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::thenby_builder<TPredicate> (std::move (predicate), true);
+        return detail::thenby_builder<TPredicate> (std::forward<TPredicate> (predicate), true);
     }
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::thenby_builder<TPredicate> thenby_descending (
-            TPredicate      predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::thenby_builder<TPredicate> (std::move (predicate), false);
+        return detail::thenby_builder<TPredicate> (std::forward<TPredicate> (predicate), false);
     }
 
     CPPLINQ_INLINEMETHOD detail::reverse_builder reverse (size_type capacity = 16U) throw ()
@@ -5124,7 +5137,7 @@ namespace cpplinq
     }
 
     template<typename TValue>
-    CPPLINQ_INLINEMETHOD detail::opt<typename detail::cleanup_type<TValue>::type> to_opt (TValue && v)
+    CPPLINQ_INLINEMETHOD detail::opt<typename detail::cleanup_type<TValue>::type> to_opt (TValue&& v)
     {
         return detail::opt<typename detail::cleanup_type<TValue>::type> (std::forward<TValue> (v));
     }
@@ -5146,40 +5159,50 @@ namespace cpplinq
     }
 
     template<typename TKeyPredicate>
-    CPPLINQ_INLINEMETHOD detail::to_map_builder<TKeyPredicate> to_map (TKeyPredicate key_predicate) throw ()
+    CPPLINQ_INLINEMETHOD detail::to_map_builder<TKeyPredicate> to_map (
+            TKeyPredicate&& key_predicate
+        ) throw ()
     {
-        return detail::to_map_builder<TKeyPredicate>(std::move (key_predicate));
+        return detail::to_map_builder<TKeyPredicate>(std::forward<TKeyPredicate> (key_predicate));
     }
 
     template<typename TKeyPredicate>
-    CPPLINQ_INLINEMETHOD detail::to_lookup_builder<TKeyPredicate> to_lookup (TKeyPredicate key_predicate) throw ()
+    CPPLINQ_INLINEMETHOD detail::to_lookup_builder<TKeyPredicate> to_lookup (
+            TKeyPredicate&& key_predicate
+        ) throw ()
     {
-        return detail::to_lookup_builder<TKeyPredicate>(std::move (key_predicate));
+        return detail::to_lookup_builder<TKeyPredicate>(std::forward<TKeyPredicate> (key_predicate));
     }
 
     // Equality operators
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::sequence_equal_builder<TOtherRange> sequence_equal (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::sequence_equal_builder<TOtherRange> sequence_equal (
+            TOtherRange&&   other_range
+        ) throw ()
     {
-        return detail::sequence_equal_builder<TOtherRange> (std::move (other_range));
+        return detail::sequence_equal_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     template <typename TOtherRange, typename TComparer>
     CPPLINQ_INLINEMETHOD detail::sequence_equal_predicate_builder<TOtherRange, TComparer> sequence_equal (
-            TOtherRange other_range
-        ,   TComparer   comparer) throw ()
+            TOtherRange&&   other_range
+        ,   TComparer&&     comparer
+        ) throw ()
     {
-        return detail::sequence_equal_predicate_builder<TOtherRange, TComparer> (std::move (other_range), std::move (comparer));
+        return detail::sequence_equal_predicate_builder<TOtherRange, TComparer> (
+                std::forward<TOtherRange> (other_range)
+            ,   std::forward<TComparer> (comparer)
+            );
     }
 
     // Element operators
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::first_predicate_builder<TPredicate> first (
-            TPredicate predicate
+            TPredicate&&    predicate
         )
     {
-        return detail::first_predicate_builder<TPredicate> (std::move (predicate));
+        return detail::first_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::first_builder first ()
@@ -5189,10 +5212,10 @@ namespace cpplinq
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::first_or_default_predicate_builder<TPredicate> first_or_default (
-            TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::first_or_default_predicate_builder<TPredicate> (predicate);
+        return detail::first_or_default_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::first_or_default_builder first_or_default () throw ()
@@ -5202,10 +5225,10 @@ namespace cpplinq
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::last_or_default_predicate_builder<TPredicate> last_or_default (
-            TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::last_or_default_predicate_builder<TPredicate> (predicate);
+        return detail::last_or_default_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::last_or_default_builder last_or_default () throw ()
@@ -5239,7 +5262,7 @@ namespace cpplinq
         ) throw ()
     {
         auto c      = count > 0 ? count : 0;
-        return detail::repeat_range<TValue> (element, c);
+        return detail::repeat_range<TValue> (std::move (element), c);
     }
 
     template <typename TValue>
@@ -5249,7 +5272,9 @@ namespace cpplinq
     }
 
     template<typename TValue>
-    CPPLINQ_INLINEMETHOD detail::singleton_range<typename detail::cleanup_type<TValue>::type> singleton (TValue&& value) throw ()
+    CPPLINQ_INLINEMETHOD detail::singleton_range<typename detail::cleanup_type<TValue>::type> singleton (
+            TValue&&    value
+        ) throw ()
     {
         return detail::singleton_range<typename detail::cleanup_type<TValue>::type> (std::forward<TValue> (value)); 
     }
@@ -5258,10 +5283,10 @@ namespace cpplinq
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::any_predicate_builder<TPredicate> any (
-        TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::any_predicate_builder<TPredicate> (std::move (predicate));
+        return detail::any_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::any_builder any () throw ()
@@ -5271,37 +5296,40 @@ namespace cpplinq
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::all_predicate_builder<TPredicate> all (
-            TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::all_predicate_builder<TPredicate> (std::move (predicate));
+        return detail::all_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     template <typename TValue>
     CPPLINQ_INLINEMETHOD detail::contains_builder<TValue> contains (
-            TValue value
+            TValue&&    value
         ) throw ()
     {
-        return detail::contains_builder<TValue> (value);
+        return detail::contains_builder<TValue> (std::forward<TValue> (value));
     }
 
     template <typename TValue, typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::contains_predicate_builder<TValue, TPredicate> contains (
-            TValue value
-        ,   TPredicate predicate
+            TValue&&        value
+        ,   TPredicate&&    predicate
         ) throw ()
     {
-        return detail::contains_predicate_builder<TValue, TPredicate> (value, predicate);
+        return detail::contains_predicate_builder<TValue, TPredicate> (
+                std::forward<TValue> (value)
+            ,   std::forward<TPredicate> (predicate)
+            );
     }
 
     // Aggregate operators
 
     template <typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::count_predicate_builder<TPredicate> count (
-            TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::count_predicate_builder<TPredicate> (std::move (predicate));
+        return detail::count_predicate_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::count_builder count () throw ()
@@ -5311,10 +5339,10 @@ namespace cpplinq
 
     template<typename TSelector>
     CPPLINQ_INLINEMETHOD detail::sum_selector_builder<TSelector> sum (
-            TSelector selector
+            TSelector&&     selector
         ) throw ()
     {
-        return detail::sum_selector_builder<TSelector> (std::move (selector));
+        return detail::sum_selector_builder<TSelector> (std::forward<TSelector> (selector));
     }
 
     CPPLINQ_INLINEMETHOD detail::sum_builder sum () throw ()
@@ -5324,10 +5352,10 @@ namespace cpplinq
 
     template<typename TSelector>
     CPPLINQ_INLINEMETHOD detail::max_selector_builder<TSelector> max (
-            TSelector selector
+            TSelector&&     selector
         ) throw ()
     {
-        return detail::max_selector_builder<TSelector> (std::move (selector));
+        return detail::max_selector_builder<TSelector> (std::forward<TSelector> (selector));
     }
 
     CPPLINQ_INLINEMETHOD detail::max_builder max () throw ()
@@ -5337,10 +5365,10 @@ namespace cpplinq
 
     template<typename TSelector>
     CPPLINQ_INLINEMETHOD detail::min_selector_builder<TSelector> min (
-            TSelector selector
+            TSelector&&     selector
         ) throw ()
     {
-        return detail::min_selector_builder<TSelector> (std::move (selector));
+        return detail::min_selector_builder<TSelector> (std::forward<TSelector> (selector));
     }
 
     CPPLINQ_INLINEMETHOD detail::min_builder min () throw ()
@@ -5350,10 +5378,10 @@ namespace cpplinq
 
     template<typename TSelector>
     CPPLINQ_INLINEMETHOD detail::avg_selector_builder<TSelector> avg (
-            TSelector selector
+            TSelector&&     selector
         ) throw ()
     {
-        return detail::avg_selector_builder<TSelector> (std::move (selector));
+        return detail::avg_selector_builder<TSelector> (std::forward<TSelector> (selector));
     }
 
     CPPLINQ_INLINEMETHOD detail::avg_builder avg () throw ()
@@ -5363,21 +5391,28 @@ namespace cpplinq
 
     template <typename TAccumulate, typename TAccumulator>
     CPPLINQ_INLINEMETHOD detail::aggregate_builder<TAccumulate, TAccumulator> aggregate (
-            TAccumulate seed
-        ,   TAccumulator accumulator
+            TAccumulate&&   seed
+        ,   TAccumulator&&  accumulator
         ) throw ()
     {
-        return detail::aggregate_builder<TAccumulate, TAccumulator> (seed, accumulator);
+        return detail::aggregate_builder<TAccumulate, TAccumulator> (
+                std::forward<TAccumulate> (seed)
+            ,   std::forward<TAccumulator> (accumulator)
+            );
     }
 
     template <typename TAccumulate, typename TAccumulator, typename TSelector>
     CPPLINQ_INLINEMETHOD detail::aggregate_result_selector_builder<TAccumulate, TAccumulator, TSelector> aggregate (
-            TAccumulate seed
-        ,   TAccumulator accumulator
-        ,   TSelector result_selector
+            TAccumulate&&   seed
+        ,   TAccumulator&&  accumulator
+        ,   TSelector&&     result_selector
         ) throw ()
     {
-        return detail::aggregate_result_selector_builder<TAccumulate, TAccumulator, TSelector> (seed, accumulator, result_selector);
+        return detail::aggregate_result_selector_builder<TAccumulate, TAccumulator, TSelector> (
+                std::forward<TAccumulate> (seed)
+            ,   std::forward<TAccumulator> (accumulator)
+            ,   std::forward<TSelector> (result_selector)
+            );
     }
 
     // set operators
@@ -5387,36 +5422,42 @@ namespace cpplinq
     }
 
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::union_builder<TOtherRange> union_with (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::union_builder<TOtherRange> union_with (
+            TOtherRange&&   other_range
+        ) throw ()
     {
-        return detail::union_builder<TOtherRange> (std::move (other_range));
+        return detail::union_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::intersect_builder<TOtherRange> intersect_with (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::intersect_builder<TOtherRange> intersect_with (
+            TOtherRange&&   other_range
+        ) throw ()
     {
-        return detail::intersect_builder<TOtherRange> (std::move (other_range));
+        return detail::intersect_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::except_builder<TOtherRange> except (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::except_builder<TOtherRange> except (
+            TOtherRange&&   other_range
+        ) throw ()
     {
-        return detail::except_builder<TOtherRange> (std::move (other_range));
+        return detail::except_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     // other operators
 
     template<typename TPredicate>
     CPPLINQ_INLINEMETHOD detail::for_each_builder<TPredicate> for_each (
-            TPredicate predicate
+            TPredicate&&    predicate
         ) throw ()
     {
-        return detail::for_each_builder<TPredicate> (std::move (predicate));
+        return detail::for_each_builder<TPredicate> (std::forward<TPredicate> (predicate));
     }
 
     CPPLINQ_INLINEMETHOD detail::concatenate_builder<char> concatenate (
-            std::string separator
-        ,   size_type capacity = 16U
+            std::string     separator
+        ,   size_type       capacity = 16U
         ) throw ()
     {
         return detail::concatenate_builder<char> (
@@ -5426,8 +5467,8 @@ namespace cpplinq
     }
 
     CPPLINQ_INLINEMETHOD detail::concatenate_builder<wchar_t> concatenate (
-            std::wstring separator
-        ,   size_type capacity = 16U
+            std::wstring    separator
+        ,   size_type       capacity = 16U
         ) throw ()
     {
         return detail::concatenate_builder<wchar_t> (
@@ -5442,9 +5483,11 @@ namespace cpplinq
     }
 
     template <typename TOtherRange>
-    CPPLINQ_INLINEMETHOD detail::zip_with_builder<TOtherRange> zip_with (TOtherRange other_range) throw ()
+    CPPLINQ_INLINEMETHOD detail::zip_with_builder<TOtherRange> zip_with (
+            TOtherRange&& other_range
+        ) throw ()
     {
-        return detail::zip_with_builder<TOtherRange> (std::move (other_range));
+        return detail::zip_with_builder<TOtherRange> (std::forward<TOtherRange> (other_range));
     }
 
     // -------------------------------------------------------------------------
