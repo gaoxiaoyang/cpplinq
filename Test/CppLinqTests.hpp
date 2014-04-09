@@ -497,7 +497,7 @@ namespace
         {
             lookup<size_type, customer> lookup (
                     16U
-                ,   from_array (customers)
+                ,   from (customers)
                 ,   [] (customer const & c){return c.id;}
                 );
 
@@ -543,7 +543,7 @@ namespace
         {
             lookup<size_type, customer_address> lookup (
                     16U
-                ,   from_array (customer_addresses)
+                ,   from (customer_addresses)
                 ,   [] (customer_address const & ca){return ca.customer_id;}
                 );
 
@@ -608,7 +608,7 @@ namespace
             TEST_ASSERT (0U, index);
         }
         {
-            auto q = from_array (ints);
+            auto q = from (ints);
 
             typedef decltype (q.front ())   return_type;
             static_assert (
@@ -663,7 +663,7 @@ namespace
             TEST_ASSERT (count_of_ints, index);
         }
         {
-            auto q = from_array (customers);
+            auto q = from (customers);
             typedef decltype (q.front ())   return_type;
             static_assert (
                     std::is_reference<return_type>::value
@@ -878,7 +878,7 @@ namespace
         }
 
         {
-            auto count_result = from_array (ints) >> count ();
+            auto count_result = from (ints) >> count ();
             TEST_ASSERT (count_of_ints, count_result);
         }
 
@@ -888,7 +888,7 @@ namespace
         }
 
         {
-            auto count_result = from_array (ints) >> count (is_even);
+            auto count_result = from (ints) >> count (is_even);
             TEST_ASSERT (even_count_of_ints, count_result);
         }
 
@@ -906,7 +906,7 @@ namespace
         }
 
         {
-            auto any_result = from_array (ints) >> any ();
+            auto any_result = from (ints) >> any ();
             TEST_ASSERT (true, any_result);
         }
 
@@ -916,7 +916,7 @@ namespace
         }
 
         {
-            auto any_result = from_array (ints) >> any (is_even);
+            auto any_result = from (ints) >> any (is_even);
             TEST_ASSERT (true, any_result);
         }
     }
@@ -944,7 +944,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> first ();
+            int first_result = from (ints) >> first ();
             TEST_ASSERT (3, first_result);
         }
 
@@ -963,7 +963,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> first (is_even);
+            int first_result = from (ints) >> first (is_even);
             TEST_ASSERT (4, first_result);
         }
 
@@ -981,7 +981,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> first_or_default ();
+            int first_result = from (ints) >> first_or_default ();
             TEST_ASSERT (3, first_result);
         }
 
@@ -991,7 +991,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> first_or_default (is_even);
+            int first_result = from (ints) >> first_or_default (is_even);
             TEST_ASSERT (4, first_result);
         }
 
@@ -1009,7 +1009,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> last_or_default ();
+            int first_result = from (ints) >> last_or_default ();
             TEST_ASSERT (5, first_result);
         }
 
@@ -1019,7 +1019,7 @@ namespace
         }
 
         {
-            int first_result = from_array (ints) >> last_or_default (is_even);
+            int first_result = from (ints) >> last_or_default (is_even);
             TEST_ASSERT (2, first_result);
         }
     }
@@ -1037,7 +1037,7 @@ namespace
 
         {
             int sum_of_ints = std::accumulate (ints, ints + count_of_ints, 0);
-            int sum_result = from_array (ints) >> sum ();
+            int sum_result = from (ints) >> sum ();
             TEST_ASSERT (sum_of_ints, sum_result);
         }
 
@@ -1048,7 +1048,7 @@ namespace
 
         {
             int sum_of_ints = std::accumulate (ints, ints + count_of_ints, 0);
-            int sum_result = from_array (ints) >> sum (double_it);
+            int sum_result = from (ints) >> sum (double_it);
             TEST_ASSERT (2*sum_of_ints, sum_result);
         }
     }
@@ -1065,7 +1065,7 @@ namespace
         }
 
         {
-            int min_result = from_array (ints) >> min ();
+            int min_result = from (ints) >> min ();
             TEST_ASSERT (1, min_result);
         }
 
@@ -1075,7 +1075,7 @@ namespace
         }
 
         {
-            int min_result = from_array (ints) >> min (double_it);
+            int min_result = from (ints) >> min (double_it);
             TEST_ASSERT (2, min_result);
         }
     }
@@ -1092,7 +1092,7 @@ namespace
         }
 
         {
-            int avg_result = from_array (ints) >> avg ();
+            int avg_result = from (ints) >> avg ();
             TEST_ASSERT (4, avg_result);
         }
 
@@ -1102,7 +1102,7 @@ namespace
         }
 
         {
-            int avg_result = from_array (ints) >> avg (double_it);
+            int avg_result = from (ints) >> avg (double_it);
             TEST_ASSERT (9, avg_result);
         }
     }
@@ -1119,7 +1119,7 @@ namespace
         }
 
         {
-            int max_result = from_array (ints) >> max ();
+            int max_result = from (ints) >> max ();
             TEST_ASSERT (9, max_result);
         }
 
@@ -1129,7 +1129,7 @@ namespace
         }
 
         {
-            int max_result = from_array (ints) >> max (double_it);
+            int max_result = from (ints) >> max (double_it);
             TEST_ASSERT (18, max_result);
         }
 
@@ -1152,7 +1152,7 @@ namespace
 
         {
             std::string concatenate_result =
-                    from_array (customers)
+                    from (customers)
                 >>  select ([](customer const & c){return c.last_name;})
                 >>  concatenate (", ")
                 ;
@@ -1175,7 +1175,7 @@ namespace
 
         {
             auto index = 0U;
-            from_array (ints) >> for_each ([&](int i){test_int_at (index, i); ++index;});
+            from (ints) >> for_each ([&](int i){test_int_at (index, i); ++index;});
             TEST_ASSERT (count_of_ints, index);
 
         }
@@ -1196,7 +1196,7 @@ namespace
 
         {
             auto index = 0U;
-            auto all_result = from_array (ints) >> all ([&](int i)-> bool {test_int_at (index, i); ++index; return true;});
+            auto all_result = from (ints) >> all ([&](int i)-> bool {test_int_at (index, i); ++index; return true;});
             TEST_ASSERT (true, all_result);
             TEST_ASSERT (count_of_ints, index);
 
@@ -1204,7 +1204,7 @@ namespace
 
         {
             std::size_t index = 0U;
-            auto all_result = from_array (ints) >> all ([&](int i)-> bool {test_int_at (index, i); ++index; return index < 10;});
+            auto all_result = from (ints) >> all ([&](int i)-> bool {test_int_at (index, i); ++index; return index < 10;});
             TEST_ASSERT (false, all_result);
             TEST_ASSERT (10U, index);
 
@@ -1223,7 +1223,7 @@ namespace
         }
 
         {
-            std::vector<int> to_vector_result = from_array (ints) >> to_vector ();
+            std::vector<int> to_vector_result = from (ints) >> to_vector ();
             TEST_ASSERT (count_of_ints, to_vector_result.size ());
             for (auto index = 0U; index < to_vector_result.size (); ++index)
             {
@@ -1244,7 +1244,7 @@ namespace
         }
 
         {
-            auto to_map_result = from_array (customers) >> to_map ([](customer const & c){return c.id;});
+            auto to_map_result = from (customers) >> to_map ([](customer const & c){return c.id;});
             TEST_ASSERT (count_of_customers, to_map_result.size ());
 
             for (auto index = 0U; index < count_of_customers; ++index)
@@ -1286,7 +1286,7 @@ namespace
         }
 
         {
-            auto lookup = from_array (customers) >> to_lookup ([] (customer const & c){return c.id;});
+            auto lookup = from (customers) >> to_lookup ([] (customer const & c){return c.id;});
 
             TEST_ASSERT (count_of_customers, lookup.size_of_keys ());
             TEST_ASSERT (count_of_customers, lookup.size_of_values ());
@@ -1311,7 +1311,7 @@ namespace
         }
 
         {
-            auto lookup = from_array (customer_addresses) >> to_lookup ([] (customer_address const & ca){return ca.customer_id;});
+            auto lookup = from (customer_addresses) >> to_lookup ([] (customer_address const & ca){return ca.customer_id;});
 
             TEST_ASSERT (2U, lookup.size_of_keys ());
             TEST_ASSERT (count_of_customer_addresses, lookup.size_of_values ());
@@ -1366,7 +1366,7 @@ namespace
         }
 
         {
-            std::list<int> to_list_result = from_array (ints) >> to_list ();
+            std::list<int> to_list_result = from (ints) >> to_list ();
             TEST_ASSERT (count_of_ints, to_list_result.size ());
 
             auto pos = to_list_result.begin ();
@@ -1391,7 +1391,7 @@ namespace
         }
 
         {
-            auto container_result = from_iterators (ints, ints + count_of_ints) >> container ();
+            auto container_result = from (ints, ints + count_of_ints) >> container ();
             std::vector<int> v (container_result.begin (), container_result.end ());
             if (TEST_ASSERT (count_of_ints, v.size ()))
             {
@@ -1402,7 +1402,7 @@ namespace
             }
         }
         {
-            auto container_result   = from_array (customers) >> container ();
+            auto container_result   = from (customers) >> container ();
             auto begin              = container_result.begin ();
             auto end                = container_result.end ();
 
@@ -1431,12 +1431,12 @@ namespace
         }
 
         {
-            auto c = from_array (ints) >> where (is_even) >> count ();
+            auto c = from (ints) >> where (is_even) >> count ();
             TEST_ASSERT (even_count_of_ints, c);
         }
 
         {
-            auto v = from_array (ints) >> where (is_even) >> first_or_default ();
+            auto v = from (ints) >> where (is_even) >> first_or_default ();
             TEST_ASSERT (4, v);
         }
     }
@@ -1458,7 +1458,7 @@ namespace
 
         {
             std::vector<std::reference_wrapper<customer const>> ref_result =
-                    from_array (customers)
+                    from (customers)
                 >>  ref ()
                 >>  to_vector ()
                 ;
@@ -1491,7 +1491,7 @@ namespace
 
         {
             std::vector<std::size_t> select_result =
-                    from_array (customers)
+                    from (customers)
                 >>  select ([](customer const & c){return c.id;})
                 >>  to_vector ()
                 ;
@@ -1537,7 +1537,7 @@ namespace
         {
             auto cas    = empty<customer_address> ();
 
-            auto join_result = from_array (customers)
+            auto join_result = from (customers)
                 >> join (
                         cas
                     ,   [](customer const & c) {return c.id;}
@@ -1554,7 +1554,7 @@ namespace
 
             auto join_result = cs
                 >> join (
-                        from_array (customer_addresses)
+                        from (customer_addresses)
                     ,   [](customer const & c) {return c.id;}
                     ,   [](customer_address const & ca) {return ca.customer_id;}
                     ,   [](customer const & c, customer_address const & ca) {return std::make_pair (c, ca);}
@@ -1565,9 +1565,9 @@ namespace
             TEST_ASSERT (0U, join_result.size ());
         }
         {
-            auto join_result = from_array (customers)
+            auto join_result = from (customers)
                 >> join (
-                        from_array (customer_addresses)
+                        from (customer_addresses)
                     ,   [](customer const & c) {return c.id;}
                     ,   [](customer_address const & ca) {return ca.customer_id;}
                     ,   [](customer const & c, customer_address const & ca) {return std::make_pair (c, ca);}
@@ -1604,7 +1604,7 @@ namespace
 
         {
             std::vector<char> select_many_result =
-                    from_iterators (customers, customers)
+                    from (customers, customers)
                 >>  select_many ([](customer const & c){return from (c.last_name);})
                 >>  to_vector ()
                 ;
@@ -1623,7 +1623,7 @@ namespace
             }
 
             std::vector<char> select_many_result =
-                    from_array (customers)
+                    from (customers)
                 >>  select_many ([](customer const & c){return from (c.last_name);})
                 >>  to_vector ()
                 ;
@@ -1700,7 +1700,7 @@ namespace
                 };
 
             auto sequence =
-                    from_array (customers)
+                    from (customers)
                 >>  orderby_ascending ([] (customer const & c) {return c.id;})
                 >>  to_vector ()
                 ;
@@ -1720,7 +1720,7 @@ namespace
                 };
 
             auto sequence =
-                    from_array (customers)
+                    from (customers)
                 >>  orderby_descending ([] (customer const & c) {return c.id;})
                 >>  to_vector ()
                 ;
@@ -1740,7 +1740,7 @@ namespace
                 };
 
             auto sequence =
-                    from_array (customers)
+                    from (customers)
                 >>  orderby_ascending ([] (customer const & c) {return c.last_name;})
                 >>  thenby_ascending ([] (customer const & c) {return c.first_name;})
                 >>  to_vector ()
@@ -1761,7 +1761,7 @@ namespace
                 };
 
             auto sequence =
-                    from_array (customers)
+                    from (customers)
                 >>  orderby_descending ([] (customer const & c) {return c.last_name;})
                 >>  thenby_descending ([] (customer const & c) {return c.first_name;})
                 >>  to_vector ()
@@ -1782,7 +1782,7 @@ namespace
                 };
 
             auto sequence =
-                    from_array (customers)
+                    from (customers)
                 >>  orderby ([] (customer const & c) {return c.last_name;}, true)
                 >>  thenby ([] (customer const & c) {return c.first_name;}, false)
                 >>  to_vector ()
@@ -1851,7 +1851,7 @@ namespace
             TEST_ASSERT (0U, index);
         }
         {
-            auto q = from_array (ints) >> skip (5);
+            auto q = from (ints) >> skip (5);
 
             auto index = 5U;
 
@@ -1890,7 +1890,7 @@ namespace
             TEST_ASSERT (0U, index);
         }
         {
-            auto q = from_array (ints) >> skip_while (smaller_than_five);
+            auto q = from (ints) >> skip_while (smaller_than_five);
             std::size_t index = 4U;
 
             while (q.next ())
@@ -1920,7 +1920,7 @@ namespace
             TEST_ASSERT (0U, index);
         }
         {
-            auto q = from_array (ints) >> take (5);
+            auto q = from (ints) >> take (5);
 
             std::size_t index = 0U;
 
@@ -1932,7 +1932,7 @@ namespace
             TEST_ASSERT (5U, index);
         }
         {
-            auto c = from_array (ints) >> take (5) >> count ();
+            auto c = from (ints) >> take (5) >> count ();
 
             TEST_ASSERT (5U, c);
         }
@@ -1957,7 +1957,7 @@ namespace
         }
 
         {
-            auto q = from_array (ints) >> take_while (smaller_than_five);
+            auto q = from (ints) >> take_while (smaller_than_five);
             std::size_t index = 0U;
 
             while (q.next ())
@@ -1970,7 +1970,7 @@ namespace
 
         // code coverage test
         {
-            auto q = from_array (ints) >> take_while ([] (int i) {return i < 0;});
+            auto q = from (ints) >> take_while ([] (int i) {return i < 0;});
 
             TEST_ASSERT (false, q.next ());
             TEST_ASSERT (false, q.next ());
@@ -1989,7 +1989,7 @@ namespace
         }
 
         {
-            bool result = from_array (ints) >> contains (1);
+            bool result = from (ints) >> contains (1);
             TEST_ASSERT (true, result);
         }
 
@@ -2005,7 +2005,7 @@ namespace
 
         {
             bool result =
-                from_array (customers)
+                from (customers)
                 >> contains (
                     customer (1, "Bill", "Gates"),
                     [](customer const& c1, customer const& c2) {return c1.id == c2.id;});
@@ -2015,7 +2015,7 @@ namespace
 
         {
             bool result =
-                from_array (customers)
+                from (customers)
                 >> contains (
                     customer (42, "Bill", "Gates"),
                     [](customer const& c1, customer const& c2) {return c1.id == c2.id;});
@@ -2041,22 +2041,22 @@ namespace
         }
 
         {
-            auto result = from_array (ints) >> element_at_or_default (0);
+            auto result = from (ints) >> element_at_or_default (0);
             TEST_ASSERT (3, result);
         }
 
         {
-            auto result = from_array (ints) >> element_at_or_default (1);
+            auto result = from (ints) >> element_at_or_default (1);
             TEST_ASSERT (1, result);
         }
 
         {
-            auto result = from_array (ints) >> element_at_or_default (count_of_ints-1);
+            auto result = from (ints) >> element_at_or_default (count_of_ints-1);
             TEST_ASSERT (5, result);
         }
 
         {
-            auto result = from_array (ints) >> element_at_or_default (count_of_ints);
+            auto result = from (ints) >> element_at_or_default (count_of_ints);
             TEST_ASSERT (0, result);
         }
 
@@ -2075,13 +2075,13 @@ namespace
 
         {
             int sum_of_simple_ints = std::accumulate (simple_ints, simple_ints + count_of_simple_ints, 0);
-            int sum_result = from_array (simple_ints) >> aggregate (0, sum_aggregator);
+            int sum_result = from (simple_ints) >> aggregate (0, sum_aggregator);
             TEST_ASSERT (sum_of_simple_ints, sum_result);
         }
 
         {
             int prod_of_simple_ints = std::accumulate (simple_ints, simple_ints + count_of_simple_ints, 1, mul_aggregator);
-            int sum_result = from_array (simple_ints) >> aggregate (1, mul_aggregator);
+            int sum_result = from (simple_ints) >> aggregate (1, mul_aggregator);
             TEST_ASSERT (prod_of_simple_ints, sum_result);
         }
 
@@ -2092,13 +2092,13 @@ namespace
 
         {
             auto sum_of_simple_ints = to_string (std::accumulate (simple_ints, simple_ints + count_of_simple_ints, 0));
-            auto sum_result = from_array (simple_ints) >> aggregate (0, sum_aggregator, to_string);
+            auto sum_result = from (simple_ints) >> aggregate (0, sum_aggregator, to_string);
             TEST_ASSERT (sum_of_simple_ints, sum_result);
         }
 
         {
             auto prod_of_simple_ints = to_string (std::accumulate (simple_ints, simple_ints + count_of_simple_ints, 1, mul_aggregator));
-            auto sum_result = from_array (simple_ints) >> aggregate (1, mul_aggregator, to_string);
+            auto sum_result = from (simple_ints) >> aggregate (1, mul_aggregator, to_string);
             TEST_ASSERT (prod_of_simple_ints, sum_result);
         }
     }
@@ -2118,7 +2118,7 @@ namespace
             int expected[] = {5,4,3,2,1};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set1) >> distinct () >> to_vector ();
+            auto result = from (set1) >> distinct () >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2129,7 +2129,7 @@ namespace
         }
 
         {
-            auto d = from_array (customers_set1) >> distinct () >> to_vector ();
+            auto d = from (customers_set1) >> distinct () >> to_vector ();
             TEST_ASSERT (4U, d.size ());
         }
 
@@ -2161,7 +2161,7 @@ namespace
         {
             int expected[] = {5,4,3,2,1};
             auto expected_size = get_array_size (expected);
-            auto result = from (empty_vector) >> union_with ( from_array (set1) ) >> to_vector ();
+            auto result = from (empty_vector) >> union_with ( from (set1) ) >> to_vector ();
             TEST_ASSERT (expected_size, result.size ());
 
             for (auto i = 0U; i < result.size () && i < expected_size; ++i)
@@ -2184,7 +2184,7 @@ namespace
         {
             int expected[] = {5,4,3,2,1};
             auto expected_size = get_array_size (expected);
-            auto result = from_array (set1) >> union_with (from (empty_vector)) >> to_vector ();
+            auto result = from (set1) >> union_with (from (empty_vector)) >> to_vector ();
             TEST_ASSERT (expected_size, result.size ());
             for (auto i = 0U; i < expected_size && i < result.size (); ++i)
             {
@@ -2197,7 +2197,7 @@ namespace
             int expected[] = {5,4,3,2,1,9,8,6,7};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set1) >> union_with (from_array (set2)) >> to_vector ();
+            auto result = from (set1) >> union_with (from (set2)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2209,7 +2209,7 @@ namespace
 
         // union of range with duplicates with itself
         {
-            auto result = from_array (ints) >> union_with (from_array (ints)) >> to_vector ();
+            auto result = from (ints) >> union_with (from (ints)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (9U, result_size);
@@ -2236,7 +2236,7 @@ namespace
 
         // intersection of an empty range with a non-empty range
         {
-            auto result = from (empty_vector) >> intersect_with (from_array (set1)) >> to_vector ();
+            auto result = from (empty_vector) >> intersect_with (from (set1)) >> to_vector ();
             TEST_ASSERT (0U, result.size ());
         }
 
@@ -2248,7 +2248,7 @@ namespace
 
         // intersection of a non-empty range with an empty range
         {
-            auto result = from_array (set1) >> intersect_with (from (empty_vector)) >> to_vector ();
+            auto result = from (set1) >> intersect_with (from (empty_vector)) >> to_vector ();
             TEST_ASSERT (0U, result.size ());
         }
 
@@ -2257,7 +2257,7 @@ namespace
             int expected[] = {5,4,1};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set1) >> intersect_with (from_array (set2)) >> to_vector ();
+            auto result = from (set1) >> intersect_with (from (set2)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2272,7 +2272,7 @@ namespace
             int expected[] = {4,5,1};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set2) >> intersect_with (from_array (set1)) >> to_vector ();
+            auto result = from (set2) >> intersect_with (from (set1)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2288,7 +2288,7 @@ namespace
             int expected [] = {3,1,4,5,9,2,6};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (numbers) >> intersect_with (from_array (numbers)) >> to_vector ();
+            auto result = from (numbers) >> intersect_with (from (numbers)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2327,7 +2327,7 @@ namespace
 
         // difference of an empty range with a non-empty range
         {
-            auto result = from (empty_vector) >> except (from_array (set1)) >> to_vector ();
+            auto result = from (empty_vector) >> except (from (set1)) >> to_vector ();
             TEST_ASSERT (0U, result.size ());
         }
 
@@ -2346,7 +2346,7 @@ namespace
             int expected[] = {5,4,3,2,1};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set1) >> except (from (empty_vector)) >> to_vector ();
+            auto result = from (set1) >> except (from (empty_vector)) >> to_vector ();
             TEST_ASSERT (expected_size, result.size ());
             for (auto i = 0U; i < expected_size && i < result.size (); ++i)
             {
@@ -2359,7 +2359,7 @@ namespace
             int expected[] = {3,2};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set1) >> except (from_array (set2)) >> to_vector ();
+            auto result = from (set1) >> except (from (set2)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2374,7 +2374,7 @@ namespace
             int expected[] = {9,8,6,7};
             auto expected_size = get_array_size (expected);
 
-            auto result = from_array (set2) >> except (from_array (set1)) >> to_vector ();
+            auto result = from (set2) >> except (from (set1)) >> to_vector ();
             auto result_size = result.size ();
 
             TEST_ASSERT (expected_size, result_size);
@@ -2388,7 +2388,7 @@ namespace
         {
            int numbers [] = {3,1,4,1,5,9,2,6,5,4};
 
-           auto result = from_array (numbers) >> except (from_array (numbers)) >> to_vector ();
+           auto result = from (numbers) >> except (from (numbers)) >> to_vector ();
            auto result_size = result.size ();
 
            TEST_ASSERT (0U, result_size);
@@ -2396,7 +2396,7 @@ namespace
 
         // difference of non-empty range with duplicates with empty set
         {
-           auto result = from_array (ints) >> except (from (empty_vector)) >> to_vector ();
+           auto result = from (ints) >> except (from (empty_vector)) >> to_vector ();
            auto result_size = result.size ();
 
            TEST_ASSERT (9U, result_size);
@@ -2435,7 +2435,7 @@ namespace
 
         // concat an empty range with a non empty range
         {
-            auto result = empty<int>() >> concat (from_array (ints)) >> to_vector ();
+            auto result = empty<int>() >> concat (from (ints)) >> to_vector ();
             TEST_ASSERT (count_of_ints, result.size ());
             for (auto i = 0U; i < count_of_ints && i < result.size ();++i)
             {
@@ -2457,7 +2457,7 @@ namespace
 
         // concat a non empty range with an empty range
         {
-            auto result = from_array (ints) >> concat (empty<int>()) >> to_vector ();
+            auto result = from (ints) >> concat (empty<int>()) >> to_vector ();
             TEST_ASSERT (count_of_ints, result.size ());
             for (auto i = 0U; i < count_of_ints && i < result.size ();++i)
             {
@@ -2469,7 +2469,7 @@ namespace
         {
             int set1[] = {0,1,2,3,4,5};
             int set2[] = {6,7,8,9};
-            auto result = from_array (set1) >> concat (from_array (set2)) >> to_vector ();
+            auto result = from (set1) >> concat (from (set2)) >> to_vector ();
             TEST_ASSERT (10U, result.size ());
             for (auto i = 0U; i < 10 && i < result.size (); ++i)
             {
@@ -2512,7 +2512,7 @@ namespace
 
         // test empty sequence with non-empty sequence
         {
-            auto result = from (empty_vector) >> sequence_equal (from_array (ints));
+            auto result = from (empty_vector) >> sequence_equal (from (ints));
             TEST_ASSERT (false, result);
         }
 
@@ -2524,7 +2524,7 @@ namespace
 
         // test non-empty sequence with empty sequence
         {
-            auto result = from_array (ints) >> sequence_equal (from (empty_vector));
+            auto result = from (ints) >> sequence_equal (from (empty_vector));
             TEST_ASSERT (false, result);
         }
 
@@ -2536,13 +2536,13 @@ namespace
 
         // test non-empty inequal sequences
         {
-            auto result = from_array (set1) >> sequence_equal (from_array (set2));
+            auto result = from (set1) >> sequence_equal (from (set2));
             TEST_ASSERT (false, result);
         }
 
         // test non-empty equal sequences
         {
-            auto result = from_array (ints) >> sequence_equal (from_array (ints));
+            auto result = from (ints) >> sequence_equal (from (ints));
             TEST_ASSERT (true, result);
         }
 
@@ -2554,7 +2554,7 @@ namespace
 
         // test against self
         {
-            auto seq = from_array (ints);
+            auto seq = from (ints);
             auto result = seq >> sequence_equal (seq);
             TEST_ASSERT (true, result);
         }
@@ -2588,31 +2588,31 @@ namespace
 
         // test empty with non-empty with comparer
         {
-            auto result = from (empty_customers) >> sequence_equal (from_array (customers), comparer);
+            auto result = from (empty_customers) >> sequence_equal (from (customers), comparer);
             TEST_ASSERT (false, result);
         }
 
         // test non-empty with empty with comparer
         {
-            auto result = from_array (customers) >> sequence_equal (from (empty_customers), comparer);
+            auto result = from (customers) >> sequence_equal (from (empty_customers), comparer);
             TEST_ASSERT (false, result);
         }
 
         // test two equal non-empty sequences with comparer
         {
-            auto result = from_array (customers1) >> sequence_equal (from_array (customers2), comparer);
+            auto result = from (customers1) >> sequence_equal (from (customers2), comparer);
             TEST_ASSERT (true, result);
         }
 
         // test two inequal non-empty sequences with comparer
         {
-            auto result = from_array (customers1) >> sequence_equal (from_array (customers3), comparer);
+            auto result = from (customers1) >> sequence_equal (from (customers3), comparer);
             TEST_ASSERT (false, result);
         }
 
         // test against self with comparer
         {
-            auto seq = from_array (customers1);
+            auto seq = from (customers1);
             auto result = seq >> sequence_equal (seq, comparer);
             TEST_ASSERT (true, result);
         }
@@ -2636,7 +2636,7 @@ namespace
         {
             int single_element_vector[] = {1};
             auto pairwise_result =
-                    from_array (single_element_vector)
+                    from (single_element_vector)
                 >>  pairwise ()
                 >>  to_vector ()
                 ;
@@ -2645,7 +2645,7 @@ namespace
 
         {
             auto pairwise_result =
-                    from_array (simple_ints)
+                    from (simple_ints)
                 >>  pairwise ()
                 >>  to_vector ()
                 ;
@@ -2675,7 +2675,7 @@ namespace
         {
             auto zip_width_result =
                     from (empty_vector)
-                >>  zip_with (from_array (simple_ints))
+                >>  zip_with (from (simple_ints))
                 >>  to_vector ()
                 ;
             TEST_ASSERT (0U, zip_width_result.size ());
@@ -2683,7 +2683,7 @@ namespace
 
         {
             auto zip_width_result =
-                    from_array (simple_ints)
+                    from (simple_ints)
                 >>  zip_with (from (empty_vector))
                 >>  to_vector ()
                 ;
@@ -2692,8 +2692,8 @@ namespace
 
         {
             auto zip_width_result =
-                    from_array (simple_ints)
-                >>  zip_with (from_array (simple_ints))
+                    from (simple_ints)
+                >>  zip_with (from (simple_ints))
                 >>  to_vector ()
                 ;
             TEST_ASSERT (count_of_simple_ints, zip_width_result.size ());
@@ -2707,8 +2707,8 @@ namespace
         {
             auto expected_size = std::min(count_of_ints, count_of_simple_ints);
             auto zip_width_result =
-                    from_array (ints)
-                >>  zip_with (from_array (simple_ints))
+                    from (ints)
+                >>  zip_with (from (simple_ints))
                 >>  to_vector ()
                 ;
             TEST_ASSERT (expected_size, zip_width_result.size ());
@@ -2722,8 +2722,8 @@ namespace
         {
             auto expected_size = std::min(count_of_ints, count_of_simple_ints);
             auto zip_width_result =
-                    from_array (simple_ints)
-                >>  zip_with (from_array (ints))
+                    from (simple_ints)
+                >>  zip_with (from (ints))
                 >>  to_vector ()
                 ;
             TEST_ASSERT (expected_size, zip_width_result.size ());
@@ -2737,8 +2737,8 @@ namespace
         {
             std::string pairrange[] = {"one", "two", "three"};
             auto zip_width_result =
-                    from_array(pairrange)
-                >>  zip_with(from_array(simple_ints))
+                    from(pairrange)
+                >>  zip_with(from(simple_ints))
                 >>  to_vector();
 
             auto expected_size = get_array_size(pairrange);

@@ -5005,12 +5005,30 @@ namespace cpplinq
     // Range sources
 
     template<typename TValueIterator>
-    CPPLINQ_INLINEMETHOD detail::from_range<TValueIterator> from_iterators (
+    CPPLINQ_INLINEMETHOD detail::from_range<TValueIterator> from (
             TValueIterator  begin
         ,   TValueIterator  end
         ) CPPLINQ_NOEXCEPT
     {
         return detail::from_range<TValueIterator> (std::move (begin), std::move (end));
+    }
+
+    template<typename TValueArray>
+    CPPLINQ_INLINEMETHOD detail::from_range<typename detail::get_array_properties<TValueArray>::iterator_type> from (
+            TValueArray & a
+        ) CPPLINQ_NOEXCEPT
+    {
+        typedef detail::get_array_properties<TValueArray>   array_properties;
+
+        typedef typename array_properties::iterator_type    iterator_type   ;
+
+        iterator_type begin = a;
+        iterator_type end   = begin + array_properties::size;
+
+        return detail::from_range<typename array_properties::iterator_type> (
+                std::move (begin)
+            ,   std::move (end)
+            );
     }
 
     template<typename TContainer>
@@ -5024,21 +5042,23 @@ namespace cpplinq
             );
     }
 
+    // Deprecated: Kept for backwards compability
+    template<typename TValueIterator>
+    CPPLINQ_INLINEMETHOD detail::from_range<TValueIterator> from_iterators (
+            TValueIterator  begin
+        ,   TValueIterator  end
+        ) CPPLINQ_NOEXCEPT
+    {
+        return from (std::move (begin), std::move (end));
+    }
+
+    // Deprecated: Kept for backwards compability
     template<typename TValueArray>
     CPPLINQ_INLINEMETHOD detail::from_range<typename detail::get_array_properties<TValueArray>::iterator_type> from_array (
             TValueArray & a
         ) CPPLINQ_NOEXCEPT
     {
-        typedef detail::get_array_properties<TValueArray>   array_properties;
-        typedef typename array_properties::iterator_type iterator_type;
-
-        iterator_type begin = a;
-        iterator_type end   = begin + array_properties::size;
-
-        return detail::from_range<typename array_properties::iterator_type> (
-                std::move (begin)
-            ,   std::move (end)
-            );
+        return from (a);
     }
 
     template<typename TContainer>
