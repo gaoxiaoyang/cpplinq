@@ -505,13 +505,19 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next () CPPLINQ_NOEXCEPT
             {
-                if (upcoming == end)
+                auto uc = upcoming;
+
+                if (uc == end)
                 {
                     return false;
                 }
 
-                current = upcoming;
-                ++upcoming;
+                auto n      = uc;
+                ++n;
+
+                current     = uc;
+                upcoming    = n;
+
                 return true;
             }
         };
@@ -592,13 +598,19 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next () CPPLINQ_NOEXCEPT
             {
-                if (upcoming == end)
+                auto uc = upcoming;
+
+                if (uc == end)
                 {
                     return false;
                 }
 
-                current = upcoming;
-                ++upcoming;
+                auto n      = uc;
+                ++n;
+
+                current     = uc;
+                upcoming    = n;
+
                 return true;
             }
         };
@@ -662,12 +674,15 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next () CPPLINQ_NOEXCEPT
             {
-                if (current >= end)
+                auto c = current;
+
+                if (c >= end)
                 {
                     return false;
                 }
 
-                ++current;
+                ++c;
+                current = c;
 
                 return true;
             }
@@ -723,12 +738,15 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next () CPPLINQ_NOEXCEPT
             {
-                if (remaining == 0U)
+                auto r = remaining;
+
+                if (r == 0U)
                 {
                     return false;
                 }
 
-                --remaining;
+                --r;
+                remaining = r;
 
                 return true;
             }
@@ -961,21 +979,22 @@ namespace cpplinq
             {
                 if (current == invalid_size)
                 {
-                    sorted_values.clear ();
+                    std::vector<value_type> sv;
 
                     while (range.next ())
                     {
-                        sorted_values.push_back (range.front ());
+                        sv.push_back (range.front ());
                     }
 
-                    if (sorted_values.size () == 0)
+                    if (sv.empty ())
                     {
+                        sorted_values.swap (sv);
                         return false;
                     }
 
                     std::sort (
-                            sorted_values.begin ()
-                        ,   sorted_values.end ()
+                            sv.begin ()
+                        ,   sv.end ()
                         ,   [this] (value_type const & l, value_type const & r)
                             {
                                 return this->compare_values (l,r);
@@ -983,15 +1002,21 @@ namespace cpplinq
                         );
 
                     current = 0U;
+                    sorted_values.swap (sv);
                     return true;
                 }
 
-                if (current < sorted_values.size ())
+                auto sz = sorted_values.size ();
+
+                auto c = current;
+
+                if (c < sz)
                 {
-                    ++current;
+                    ++c;
+                    current = c;
                 }
 
-                return current < sorted_values.size ();
+                return c < sz;
             }
         };
 
@@ -1138,21 +1163,22 @@ namespace cpplinq
             {
                 if (current == invalid_size)
                 {
-                    sorted_values.clear ();
+                    std::vector<value_type> sv;
 
                     while (range.forwarding_next ())
                     {
-                        sorted_values.push_back (range.forwarding_front ());
+                        sv.push_back (range.forwarding_front ());
                     }
 
-                    if (sorted_values.size () == 0)
+                    if (sv.empty ())
                     {
+                        sorted_values.swap (sv);
                         return false;
                     }
 
                     std::sort (
-                            sorted_values.begin ()
-                        ,   sorted_values.end ()
+                            sv.begin ()
+                        ,   sv.end ()
                         ,   [this] (value_type const & l, value_type const & r)
                             {
                                 return this->compare_values (l,r);
@@ -1160,15 +1186,20 @@ namespace cpplinq
                         );
 
                     current = 0U;
+                    sorted_values.swap (sv);
                     return true;
                 }
 
-                if (current < sorted_values.size ())
+                auto c  = current               ;
+                auto sz = sorted_values.size () ;
+
+                if (c < sz)
                 {
-                    ++current;
+                    ++c;
+                    current = c;
                 }
 
-                return current < sorted_values.size ();
+                return c < sz;
             }
         };
 
@@ -1267,7 +1298,7 @@ namespace cpplinq
             {
                 CPPLINQ_ASSERT (!start);
                 CPPLINQ_ASSERT (!reversed.empty ());
-                return reversed[reversed.size () - 1];
+                return reversed.back ();
             }
 
             CPPLINQ_INLINEMETHOD bool next ()
@@ -1276,15 +1307,17 @@ namespace cpplinq
                 {
                     start = false;
 
-                    reversed.clear ();
-                    reversed.reserve (capacity);
+                    std::vector<value_type> rev;
+                    rev.reserve (capacity);
 
                     while (range.next ())
                     {
-                        reversed.push_back (range.front ());
+                        rev.push_back (range.front ());
                     }
 
-                    return !reversed.empty ();
+                    auto empty = rev.empty ();
+                    reversed.swap (rev);
+                    return !empty;
                 }
 
                 if (reversed.empty ())
@@ -1481,12 +1514,16 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next ()
             {
-                if (current >= count)
+                auto c = current;
+
+                if (c >= count)
                 {
                     return false;
                 }
 
-                ++current;
+                ++c;
+                current = c;
+
                 return range.next ();
             }
         };
@@ -1686,21 +1723,29 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next ()
             {
-                if (current == invalid_size)
+                auto c = current;
+
+                if (c == invalid_size)
                 {
                     return false;
                 }
 
-                while (current < count && range.next ())
+                if (c < count)
                 {
-                    ++current;
+                    while (c < count && range.next ())
+                    {
+                        ++c;
+                    }
+
+                    if (c < count)
+                    {
+                        current = invalid_size;
+                        return false;
+                    }
+
+                    current = c;
                 }
 
-                if (current < count)
-                {
-                    current = invalid_size;
-                    return false;
-                }
 
                 return range.next ();
             }
@@ -2282,7 +2327,7 @@ namespace cpplinq
                     }
 
                     current = map.end ();
-                    if (map.size () == 0U)
+                    if (map.empty ())
                     {
                         return false;
                     }
@@ -3325,7 +3370,7 @@ namespace cpplinq
                     ++index;
                 }
 
-                if (v.size () == 0)
+                if (v.empty ())
                 {
                     return;
                 }
@@ -4369,8 +4414,8 @@ namespace cpplinq
                 auto copy = other_range;
                 for (;;)
                 {
-                    bool next1 = range.next ();
-                    bool next2 = copy.next ();
+                    auto next1 = range.next ();
+                    auto next2 = copy.next ();
 
                     // sequences are not of same length
                     if (next1 != next2)
@@ -4421,8 +4466,8 @@ namespace cpplinq
                 auto copy = other_range;
                 for (;;)
                 {
-                    bool next1 = range.next ();
-                    bool next2 = copy.next ();
+                    auto next1 = range.next ();
+                    auto next2 = copy.next ();
 
                     // sequences are not of same length
                     if (next1 != next2)
@@ -5007,8 +5052,9 @@ namespace cpplinq
 
             CPPLINQ_INLINEMETHOD bool next () CPPLINQ_NOEXCEPT
             {
-                current_value = predicate ();
-                return current_value;
+                auto c = predicate ();
+                current_value = c;
+                return c;
             }
         };
 
