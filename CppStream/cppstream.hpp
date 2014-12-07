@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 #// ----------------------------------------------------------------------------
-#define CPPSTREAM_INLINE inline
+#define CPPSTREAM_INLINE inline __declspec(noalias)
 #define CPPSTREAM_SINK(type)                    \
     type (type &&)                  = default;  \
     type & operator= (type &&)      = default;  \
