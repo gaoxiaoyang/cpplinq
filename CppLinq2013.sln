@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22310.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppLinq2013", "Test\CppLinq2013.vcxproj", "{B2C5078E-E859-4BF8-A799-75653FE524AB}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppLinq2013.UnitTest", "CppLinq2013.UnitTest\CppLinq2013.UnitTest.vcxproj", "{081E2554-9A17-45E3-9264-DC677FCE8DA2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppStream2013", "CppStream2013\CppStream2013.vcxproj", "{915E412D-500A-4D5A-ABA2-D4C73BE2E368}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,14 @@ Global
 		{081E2554-9A17-45E3-9264-DC677FCE8DA2}.Release|Win32.Build.0 = Release|Win32
 		{081E2554-9A17-45E3-9264-DC677FCE8DA2}.Release|x64.ActiveCfg = Release|x64
 		{081E2554-9A17-45E3-9264-DC677FCE8DA2}.Release|x64.Build.0 = Release|x64
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Debug|Win32.ActiveCfg = Debug|Win32
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Debug|Win32.Build.0 = Debug|Win32
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Debug|x64.ActiveCfg = Debug|x64
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Debug|x64.Build.0 = Debug|x64
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Release|Win32.ActiveCfg = Release|Win32
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Release|Win32.Build.0 = Release|Win32
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Release|x64.ActiveCfg = Release|x64
+		{915E412D-500A-4D5A-ABA2-D4C73BE2E368}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
