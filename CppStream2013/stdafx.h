@@ -21,19 +21,10 @@
 #endif
 // ----------------------------------------------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
 // ----------------------------------------------------------------------------------------------
-#include <algorithm>
-#include <chrono>
-#include <cassert>
-#include <climits>
-#include <exception>
-#include <iterator>
-#include <list>
-#include <map>
-#include <numeric>
-#include <set>
-#include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 // ----------------------------------------------------------------------------------------------
 #endif  // HEADER_GUARD__STDAFX

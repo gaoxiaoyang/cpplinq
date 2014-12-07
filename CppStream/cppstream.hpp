@@ -54,7 +54,7 @@ namespace cppstream
 
             using value_type = decltype (*get_iterator ());
 
-            TIterator begin ; 
+            TIterator begin ;
             TIterator end   ;
 
             CPPSTREAM_SOURCE (iterator_source);
@@ -78,9 +78,9 @@ namespace cppstream
         template<typename TValue>
         struct range_source
         {
-            using value_type = TValue   ;
+            using value_type = TValue;
 
-            TValue begin ; 
+            TValue begin ;
             TValue end   ;
 
             CPPSTREAM_SOURCE (range_source);
@@ -107,7 +107,7 @@ namespace cppstream
             static TMapPredicate                get_map ()  ;
             static typename TSource::value_type get_value ();
 
-            using value_type    = decltype (get_map () (get_value ()))  ;
+            using value_type    = decltype (get_map () (get_value ()));
 
             TSource             source  ;
             TMapPredicate       map     ;
@@ -146,9 +146,9 @@ namespace cppstream
             }
 
             template<typename TSource>
-            CPPSTREAM_INLINE auto bind (TSource && source) const 
+            CPPSTREAM_INLINE auto bind (TSource && source) const
             {
-                using source_type   = cleanup_type<TSource>::type   ;
+                using source_type   = typename cleanup_type<TSource>::type;
                 return map_source<source_type, TMapPredicate> (
                         std::forward<TSource> (source)
                     ,   map
@@ -203,9 +203,9 @@ namespace cppstream
             }
 
             template<typename TSource>
-            CPPSTREAM_INLINE auto bind (TSource && source) const 
+            CPPSTREAM_INLINE auto bind (TSource && source) const
             {
-                using source_type   = cleanup_type<TSource>::type   ;
+                using source_type   = typename cleanup_type<TSource>::type;
                 return filter_source<source_type, TFilterPredicate> (
                         std::forward<TSource> (source)
                     ,   filter
@@ -227,10 +227,10 @@ namespace cppstream
             }
 
             template<typename TSource>
-            CPPSTREAM_INLINE auto bind (TSource && source) const 
+            CPPSTREAM_INLINE auto bind (TSource && source) const
             {
-                using source_type   = cleanup_type<TSource>::type                   ;
-                using value_type    = cleanup_type<source_type::value_type>::type   ;
+                using source_type   = typename cleanup_type<TSource>::type                          ;
+                using value_type    = typename cleanup_type<typename source_type::value_type>::type ;
 
                 std::vector<value_type> result;
                 result.reserve (capacity);
@@ -255,10 +255,10 @@ namespace cppstream
             sum_sink ()  = default;
 
             template<typename TSource>
-            CPPSTREAM_INLINE auto bind (TSource && source) const 
+            CPPSTREAM_INLINE auto bind (TSource && source) const
             {
-                using source_type   = cleanup_type<TSource>::type                   ;
-                using value_type    = cleanup_type<source_type::value_type>::type   ;
+                using source_type   = typename cleanup_type<TSource>::type                          ;
+                using value_type    = typename cleanup_type<typename source_type::value_type>::type ;
 
                 auto sum = value_type ();
 
@@ -278,19 +278,19 @@ namespace cppstream
 
     template<typename TValue>
     CPPSTREAM_INLINE auto from_range (TValue begin, TValue end)
-    {                         
+    {
         return details::range_source<TValue> (std::move (begin), std::move (end));
     }
 
     template<typename TIterator>
     CPPSTREAM_INLINE auto from_iterators (TIterator begin, TIterator end)
-    {                         
+    {
         return details::iterator_source<TIterator> (std::move (begin), std::move (end));
     }
 
     template<typename TArray>
     CPPSTREAM_INLINE auto from_array (TArray & a)
-    {                         
+    {
         auto rank           = std::extent<TArray>::value;
         auto begin          = a                         ;
         auto end            = begin + rank              ;
@@ -300,13 +300,13 @@ namespace cppstream
 
     template<typename TMapPredicate>
     CPPSTREAM_INLINE auto map (TMapPredicate map)
-    {                         
+    {
         return details::map_sink<TMapPredicate> (std::move (map));
     }
 
     template<typename TFilterPredicate>
     CPPSTREAM_INLINE auto filter (TFilterPredicate filter)
-    {                         
+    {
         return details::filter_sink<TFilterPredicate> (std::move (filter));
     }
 
