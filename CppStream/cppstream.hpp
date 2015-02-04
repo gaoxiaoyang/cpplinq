@@ -65,11 +65,21 @@ namespace cppstream
             {
             }
 
-            template<typename TReceiver>
+            template<bool is_cancellable, typename TReceiver>
             CPPSTREAM_INLINE void pull (TReceiver && receiver) const
             {
-                for (auto iter = begin; iter != end && receiver (*iter); ++iter)
-                    ;
+                if (is_cancellable)
+                {
+                    for (auto iter = begin; iter != end && receiver (*iter); ++iter)
+                        ;
+                }
+                else
+                {
+                    for (auto iter = begin; iter != end; ++iter)
+                    {
+                        receiver (*iter);
+                    }
+                }
             }
         };
 
@@ -91,11 +101,21 @@ namespace cppstream
             {
             }
 
-            template<typename TReceiver>
+            template<bool is_cancellable, typename TReceiver>
             CPPSTREAM_INLINE void pull (TReceiver && receiver) const
             {
-                for (auto iter = begin; iter != end && receiver (iter); ++iter)
-                    ;
+                if (is_cancellable)
+                {
+                    for (auto iter = begin; iter != end && receiver (iter); ++iter)
+                        ;
+                }
+                else
+                {
+                    for (auto iter = begin; iter != end; ++iter)
+                    {
+                        receiver (iter);
+                    }
+                }
             }
         };
 
@@ -120,16 +140,16 @@ namespace cppstream
             {
             }
 
-            template<typename TReceiver>
+            template<bool is_cancellable, typename TReceiver>
             CPPSTREAM_INLINE void pull (TReceiver && receiver) const
             {
-                source.pull (
-                    [this, r = std::forward<TReceiver> (receiver)] (auto v)
-                    {
-                        r (map (std::move (v)));
+                source.pull<is_cancellable> (
+                        [this, r = std::forward<TReceiver> (receiver)] (auto v)
+                        {
+                            r (map (std::move (v)));
 
-                        return true;
-                    });
+                            return true;
+                        });
             }
         };
 
@@ -140,7 +160,7 @@ namespace cppstream
 
             CPPSTREAM_SINK (map_sink);
 
-            CPPSTREAM_INLINE map_sink (TMapPredicate map) noexcept
+            CPPSTREAM_INLINE map_sink (TMapPredicate && map) noexcept
                 : map (std::move (map))
             {
             }
@@ -174,19 +194,19 @@ namespace cppstream
             {
             }
 
-            template<typename TReceiver>
+            template<bool is_cancellable, typename TReceiver>
             CPPSTREAM_INLINE void pull (TReceiver && receiver) const
             {
-                source.pull (
-                    [this, r = std::forward<TReceiver> (receiver)] (auto v)
-                    {
-                        if (filter (v))
+                source.pull<is_cancellable> (
+                        [this, r = std::forward<TReceiver> (receiver)] (auto v)
                         {
-                            r (std::move (v));
-                        }
+                            if (filter (v))
+                            {
+                                r (std::move (v));
+                            }
 
-                        return true;
-                    });
+                            return true;
+                        });
             }
         };
 
@@ -235,8 +255,8 @@ namespace cppstream
                 std::vector<value_type> result;
                 result.reserve (capacity);
 
-                std::forward<TSource> (source).pull (
-                    [&result] (auto v)
+                std::forward<TSource> (source).pull<false> (
+                        [&result] (auto v)
                         {
                             result.push_back (std::move (v));
                             return true;
@@ -262,14 +282,44 @@ namespace cppstream
 
                 auto sum = value_type ();
 
-                std::forward<TSource> (source).pull (
-                    [&sum] (auto v)
+                std::forward<TSource> (source).pull<false> (
+                        [&sum] (auto v)
                         {
                             sum += v;
                             return true;
                         });
 
                 return sum;
+            }
+        };
+
+        // --------------------------------------------------------------------
+
+        template<typename TForeachPredicate>
+        struct foreach_sink
+        {
+            TForeachPredicate foreach;
+
+            CPPSTREAM_SINK (foreach_sink);
+
+            CPPSTREAM_INLINE foreach_sink (TForeachPredicate foreach) noexcept
+                : foreach (std::move (foreach))
+            {
+            }
+
+
+            template<typename TSource>
+            CPPSTREAM_INLINE auto bind (TSource && source) const
+            {
+                using source_type   = typename cleanup_type<TSource>::type;
+
+                std::forward<TSource> (source).pull<false> (
+                        [this] (auto v)
+                        {
+                            foreach (v);
+
+                            return true;
+                        });
             }
         };
 
@@ -319,6 +369,13 @@ namespace cppstream
     {
         return details::sum_sink ();
     }
+
+    template<typename TForeachPredicate>
+    CPPSTREAM_INLINE auto foreach (TForeachPredicate foreach)
+    {
+        return details::foreach_sink<TForeachPredicate> (std::move (foreach));
+    }
+
 }
 // ----------------------------------------------------------------------------
 #endif  // CPPSTREAM__HEADER_GUARD
